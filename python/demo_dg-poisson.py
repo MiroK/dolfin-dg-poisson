@@ -9,12 +9,12 @@ on the unit square with source f given by
 and boundary conditions given by
 
     u(x, y)     = u0 on x = 0 and x = 1
-    du/dn(x, y) = g on y = 0 and y = 1
+    du/dn(x, y) = g  on y = 0 and y = 1
 
 where
 
-    u0 = x[0] + 0.25*sin(2*pi*x[1])
-    g = (x[1] - 0.5)**2            
+    u0 = x + 0.25*sin(2*pi*x)
+    g = (y - 0.5)**2 
 
 using a discontinuous Galerkin formulation (interior penalty method).
 """
@@ -76,7 +76,7 @@ boundaries = FacetFunction('size_t', mesh, 0)
 NeumanBoundary().mark(boundaries, 2)
 DirichletBoundary().mark(boundaries, 1)
 
-# Define surface measure aware of Dirichlet and Neumann boundaries
+# Define outer surface measure aware of Dirichlet and Neumann boundaries
 ds = Measure('ds')[boundaries]
 
 # Define parameters

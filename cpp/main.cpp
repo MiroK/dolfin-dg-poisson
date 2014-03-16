@@ -18,6 +18,8 @@
 // First added:  2006-12-05
 // Last changed: 2014-03-16
 //
+// Modified by Miroslav Kuchta 2014
+//
 // This demo program solves Poisson's equation,
 //
 //     - div grad u(x, y) = f(x, y)
@@ -29,12 +31,12 @@
 // and boundary conditions given by
 //
 //     u(x, y)     = u0 on x = 0 and x = 1
-//     du/dn(x, y) = g on y = 0 and y = 1
+//     du/dn(x, y) = g  on y = 0 and y = 1
 //
 // where
 //
-//     u0 = x[0] + 0.25*sin(2*pi*x[1])
-//     g = (x[1] - 0.5)**2            
+//     u0 = x + 0.25*sin(2*pi*x)
+//     g = (y - 0.5)**2            
 //
 // using a discontinuous Galerkin formulation (interior penalty method).
 
@@ -75,7 +77,7 @@ int main()
     }
   };
 
-  // Sub domain for Dirichlet boundary condition
+  // Sub domain for Dirichlet boundary condition, x = 1 and x = 0
   class DirichletBoundary : public SubDomain
   {
     bool inside(const Array<double>& x, bool on_boundary) const
@@ -84,7 +86,7 @@ int main()
     }
   };
 
-  // Sub domain for Neumann boundary condition
+  // Sub domain for Neumann boundary condition, y = 1 and y = 0
   class NeumannBoundary : public SubDomain
   {
     bool inside(const Array<double>& x, bool on_boundary) const
@@ -105,9 +107,10 @@ int main()
   Poisson::FunctionSpace V(mesh);
 
   // Mark facets of the mesh
-  FacetFunction<std::size_t> boundaries(mesh, 0);
   NeumannBoundary neumann_boundary;
   DirichletBoundary dirichlet_boundary;
+  
+  FacetFunction<std::size_t> boundaries(mesh, 0);
   neumann_boundary.mark(boundaries, 2);
   dirichlet_boundary.mark(boundaries, 1);
 
@@ -118,7 +121,7 @@ int main()
   L.u0 = u0;
   L.g = g;
 
-  // Attach marked facet to bilinear and linear form
+  // Attach marked facets to bilinear and linear form
   a.ds = boundaries;
   L.ds = boundaries;
 
